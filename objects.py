@@ -10,8 +10,10 @@ haircutDurationMax = 15
 
 
 class Customer:
-    def __init__(self, id):
+
+    def __init__(self, id, enterTime):
         self.id = id
+        self.enterTime = enterTime
 
 
 class Barber:
@@ -28,11 +30,11 @@ class Barber:
     def cutHair(self, customer):
         # Установить состояние процесса
         self.barberWorkingEvent.clear()
-        print('{} is having a haircut'.format(customer.id))
+        print('{} на стрижке'.format(customer.id))
         randomHairCuttingTime = random.randrange(haircutDurationMin, haircutDurationMax + 1)
         # столько времени работает
         time.sleep(randomHairCuttingTime)
-        print('{} is done'.format(customer.id))
+        print('{} подстрижен'.format(customer.id))
 
 
 class BarberShop:
@@ -53,24 +55,24 @@ class BarberShop:
                 self.barber.cutHair(c)
             else:
                 mutex.release()
-                print('Aaah, all done, going to sleep')
+                print('Парикмахер спит')
                 self.barber.sleep()
-                print('Barber woke up')
+                print('Парикмахер не спит')
 
     def openShop(self):
-        print('Barber shop is opening')
+        print('Парикмахерская открыта!')
         workingThread = Thread(target=self.barberGoToWork)
         workingThread.start()
 
     def enterBarberShop(self, customer):
         mutex.acquire()
-        print('>> {0} entered the shop and is looking for a seat'.format(customer.id))
+        print('>> {} заходит и ищет место'.format(customer.id))
 
         if len(self.waitingCustomers) == self.numberOfSeats:
-            print('Waiting room is full, {0} is leaving.'.format(customer.id))
+            print('Мест нет, {} уходит.'.format(customer.id))
             mutex.release()
         else:
-            print('{0} sat down in the waiting room'.format(customer.id))
+            print('{} садится на место в зале ожидания'.format(customer.id))
             self.waitingCustomers.append(customer)
             mutex.release()
             self.barber.wakeUp()
